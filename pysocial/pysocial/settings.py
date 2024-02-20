@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import os
 
 from pathlib import Path
 
@@ -24,8 +25,7 @@ SECRET_KEY = 'django-insecure--gaq#4d+vkzz7=%brkv@gr!t_0oqhi6$=8$g&r!d-ql^63$t&q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -35,11 +35,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'social_network.apps.SocialNetworkConfig',
-    'rest_framework',
-    'rest_framework.authtoken', #тандартная таблица для авторизации по токенам
-    'djoser',
+    'users.apps.UsersConfig',
+    'crispy_bootstrap5',
+    'crispy_forms',
+    # 'rest_framework',
+    # 'rest_framework.authtoken', #тандартная таблица для авторизации по токенам
+    # 'djoser',
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,7 +58,9 @@ ROOT_URLCONF = 'pysocial.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'pysocial/templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -117,41 +121,59 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#настрйоки встроенного сайта измененния записей через API
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', #эта и ниже аписи нужны для пагинации работает для
-# сервера
-    'PAGE_SIZE': 2,
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer'
-    ],
+AUTH_USER_MODEL = "users.User"
 
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny'
-    ],
+LOGIN_REDIRECT_URL = 'profile'
 
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication', #разрешение на аутентификацию по токенам
-        'rest_framework.authentication.BasicAuthentication', # 2 строчки ниже разрешают аутентиф по сессиям
-        'rest_framework.authentication.SessionAuthentication',
-    ]
-}
+# crispy_form
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+# crispy_form - END
 
 
 
+# настрйоки встроенного сайта измененния записей через API
+# REST_FRAMEWORK = {
+#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', #эта и ниже аписи нужны для пагинации работает для
+# # сервера
+#     'PAGE_SIZE': 2,
+#
+#     'DEFAULT_RENDERER_CLASSES': [
+#         'rest_framework.renderers.JSONRenderer',
+#         'rest_framework.renderers.BrowsableAPIRenderer'
+#     ],
+#
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.AllowAny'
+#     ],
+#
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.TokenAuthentication', #разрешение на аутентификацию по токенам
+#         'rest_framework.authentication.BasicAuthentication', # 2 строчки ниже разрешают аутентиф по сессиям
+#         'rest_framework.authentication.SessionAuthentication',
+#     ]
+# }
 
-
-
-
-
-
-
+#
+# SOCIAL_AUTH_PIPELINE = (
+#     'social_core.pipeline.social_auth.social_details',
+#     'social_core.pipeline.social_auth.social_uid',
+#     'social_core.pipeline.social_auth.auth_allowed',
+#     'social_core.pipeline.social_auth.social_user',
+#     'social_core.pipeline.user.get_username',
+#     'users.pipeline.new_users_handler',
+#     'social_core.pipeline.user.create_user',
+#     'social_core.pipeline.social_auth.associate_user',
+#     'social_core.pipeline.social_auth.load_extra_data',
+#     'social_core.pipeline.user.user_details',
+# )

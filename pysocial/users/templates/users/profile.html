@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<div class="container">
+    <div class="row text-center pt-3">
+        <div class="col-4 offset-md-4">
+            <div class="card gfg border rounded-pill border-dark">
+                <div class="card-body">
+                    <h6>Мой профиль</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container pt-2">
+    <div class="col-6 offset-md-3 border border-primary-subtle">
+        <div class="row g-3 text-center">
+            {% if user_object.photo %}
+            <div class="col-6">
+                <img src="{{ user_object.photo.url }}" class="bd-placeholder-img rounded-circle mt-3"
+                     height="100" width="100" alt="не грузится фото">
+            </div>
+            {% else %}
+            <div class="col-6">
+                <img src="{% static 'social_network/images/photo_net.png' %}"
+                     class="bd-placeholder-img rounded-circle mt-3"
+                     height="100" width="100" alt="не грузится фото">
+            </div>
+            {% endif %}
+
+            <div class="col-6 mt-5">
+                {% if user_object.date_birth %}
+                Дата рождения:<br>
+                {{ user_object.date_birth }}
+                {% else %}
+                <p>Дата рождения: - </p>
+                {% endif %}
+            </div>
+
+
+            <div class="col-6">
+                {{ user_object.username }}
+            </div>
+
+            <div class="col-6 text-center">
+                <div class="col-12">
+                    {% if user_object.grade %}
+                    Грейд:<br>
+                    {{ user_object.grade }}
+                    {% else %}
+                    <p>Грейд: - </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-6 text-center">
+                Имя:<br>
+                {{ user_object.first_name }}
+            </div>
+
+            <div class="col-6 text-center">
+                Фамилия:<br>
+                {{ user_object.last_name }}
+            </div>
+
+            <div class="col-12 text-center">
+                {% if user_object.about_me %}
+                Обо мне:<br>
+                <p>{{ user_object.about_me }}</p>
+                {% else %}
+                <p>Обо мне: - </p>
+                {% endif %}
+            </div>
+
+            <div class="col-6 text-center">
+                <p>{{ user_object.email }}</p>
+            </div>
+
+            <div class="col-6 text-center">
+                <a href="{% url 'users:update_profile' %}" class="btn btn-outline-primary"
+                   role="button">Редактировать</a>
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+</div>
+
+{% endblock %}

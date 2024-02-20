@@ -1,0 +1,28 @@
+.container {
+    max-width: 960px;
+}
+
+.super-color {
+    background: linear-gradient(to right, #f8f9e0 0%,#deeefc 14%);
+
+}
+
+header {
+    height: 47px;
+    border-radius: 0px 0px 12px 12px;
+    background: linear-gradient(to right, #f8f9e0 0%,#deeefc 14%);
+}
+
+
+
+.rad {
+    border-radius: 10px;
+}
+
+
+.for-forms label{
+
+}
+
+
+

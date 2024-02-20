@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-8 offset-md-2 mt-5">
+            <div class="border border-1 border-black text-center rad">
+                <p class="text-center">Pysocial - это новая социальная сеть для разработчиков на python</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-3 offset-md-3 mt-5">
+            <div class="border border-1 border-black text-center rad">
+                <a href = "{% url 'users:login' %}">Войти</a>
+            </div>
+        </div>
+
+        <div class="col-3 mt-5">
+            <div class="border border-1 border-black text-center rad">
+                <a href = "{% url 'users:register' %}">Зарегистрироваться</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
