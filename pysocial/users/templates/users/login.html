@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
 
 <div class="container">
@@ -18,17 +18,21 @@
             <div class="row g-3">
                 <div class="col-8 offset-md-2">
                     <div class="form-group" style="">
-                        <form method = "POST">
+                        <form method="POST">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <button class = "btn btn-secondary">Post</button>
+                            <button class="btn btn-secondary">Войти</button>
                         </form>
                     </div>
+                    <a href="{% url 'users:password_reset' %}">Забыли пароль?</a>
                 </div>
+                <a href="{% url 'social:begin' 'github' %}"><img src="{% static 'social_network/images/github.png' %}"
+                                                                 class="bd-placeholder-img rounded-circle"
+                                                                 height="50" width="50"></a>
             </div>
         </div>
     </div>
 </div>
 
 
-        {% endblock %}
+{% endblock %}

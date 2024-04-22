@@ -13,14 +13,14 @@ class EmailAuthBackend(BaseBackend):
                 return user
             return None
 
-        except (user_model.DoesNotExist,
-                user_model.MultipleObjectsReturned):  # Оработка исключений DoesNotExist(не нашлось резов)  MultipleObjecsReturned(нашлось много резов)
+        # Оработка исключений DoesNotExist(не нашлось резов)  MultipleObjecsReturned(нашлось много резов)
+        except (user_model.DoesNotExist, user_model.MultipleObjectsReturned):
             return None
 
-    def get_user(self, user_id): #метод отображения пользователя рядом с кнопкой войти
+    def get_user(self, user_id):
+        # метод отображения пользователя рядом с кнопкой войти
         user_model = get_user_model()
         try:
             return user_model.objects.get(pk=user_id)
-
         except user_model.DoesNotExist:
             return None

@@ -6,24 +6,29 @@
 
 <div class="container">
     <div class="row text-center pt-3">
-        <div class="col-4 offset-md-4">
-            <div class="card gfg border rounded-pill border-dark">
+        <div class="col-4 offset-md-4 ">
+            <div class="border border-primary-subtle border-2">
                 <div class="card-body">
-                    <h6>Редактирование профиля</h6>
+                    <h4>Редактирование профиля</h4>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
 <div class="container pt-2">
-    <div class="col-6 offset-md-3 border border-primary-subtle">
+    <div class="col-6 offset-md-3 border border-primary-subtle border-2">
         <div class="row g-3 text-center">
             <div class="form-group" style="">
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="col-6 offset-md-3 text-center">
                         {% crispy form %}
+                        {% if form.date_birth.errors %}
+                        <p class="text-danger">{{ form.date_birth.errors }}</p>
+                        {% endif %}
+                        <a href="{% url 'users:password_change' %}">Сменить пароль </a>
                     </div>
                 </form>
             </div>
@@ -32,3 +37,5 @@
 </div>
 
 {% endblock %}
+
+
