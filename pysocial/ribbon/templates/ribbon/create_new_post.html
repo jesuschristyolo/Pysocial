@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block avatar %}
+{% include 'avatar_base.html' %}
+{% endblock %}
+
+{% block content %}
+
+
+
+
+<div class="container mt-3" style="max-width: 800px;">
+    <div class="card">
+        <div class="text-center card-body">
+            <h2 class="mb-0">Создание нового поста</h2>
+        </div>
+    </div>
+</div>
+
+<div class='code_body'>
+    <form action="{% url 'ribbon:create_new_post' %}" method="post">
+        {% csrf_token %}
+        <div>
+            <label for="codearea">Напишите код: </label>
+            <textarea id="codearea" name="codearea" rows="10">{% if code %}{{ code }}{% endif %}</textarea>
+        </div>
+        <hr>
+        <div>
+            <label for="output">Output</label>
+            <textarea id="output" name="output" rows="4" disabled>{{ output }}</textarea>
+        </div>
+
+        <div>
+            <label for="post_content">Комментарий</label>
+            <textarea id="post_content" name="post_content"
+                      rows="4">{% if post_content %}{{ post_content }}{% endif %}</textarea>
+        </div>
+
+        <button type="submit">Run Code</button>
+        <button type="submit" name="create_post">Опубликовать пост</button>
+    </form>
+</div>
+
+
+<script>
+        var codeEditor = CodeMirror.fromTextArea(document.getElementById("codearea"), {
+            mode: "python",
+            lineNumbers: true,
+            indentUnit: 4,
+            extraKeys: { Tab: "indentMore", "Shift-Tab": "indentLess" },
+        });
+
+
+</script>
+
+
+{% endblock %}

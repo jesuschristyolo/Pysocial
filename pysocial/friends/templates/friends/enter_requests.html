@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block avatar %}
+{% include 'avatar_base.html' %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container pt-2 mt-5">
+    <div class="col-8 offset-md-2 border border-primary-subtle">
+        <div class="row g-3 text-center">
+            <div class="col-10 offset-md-1">
+                <div class="col-12 text-center mt-5">
+                    <h4>Входящие запросы</h4>
+                </div>
+
+                <div class="col-12 text-center mt-5">
+                    <div class="row g-3 justify-content-center">
+                        {% for obj in page_obj %}
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+
+                                    <form method="post" action="{% url 'friends:enter_requests' %}">
+                                        {% csrf_token %}
+                                        <img src="{{ obj.sender.photo.url }}"
+                                             class="bd-placeholder-img rounded-circle position-absolute top-0 start-0 mt-2 ms-2"
+                                             height="40" width="40">
+                                        <a href="{% url 'users:other_user_profile' obj.sender.id %}">{{ obj.sender.username }}</a>
+
+                                        <button type="submit" class="btn btn-success ms-4" name="button_pressed"
+                                                value="accept_{{ obj.sender.id }}">Принять
+                                        </button>
+
+                                        <button type="submit" class="btn btn-danger position-absolute top-20 end-0 me-3"
+                                                name="button_pressed" value="reject_{{ obj.sender.id }}">Отклонить
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-12 text-center mt-5 mb-3">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+
+                            {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link"
+                                                     href="/friends/enter_requests/?page={{ page_obj.previous_page_number }}">Previous</a>
+                            </li>
+                            <li class="page-item"><a class="page-link" href="/friends/enter_requests/?page=1">1</a></li>
+                            {% endif %}
+
+                            <li class="page-item disabled"><a class="page-link"
+                                                              href="/friends/enter_requests/?page={{ page_obj.number }}">Page
+                                {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a></li>
+
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link"
+                                                     href="/friends/enter_requests/?page={{ page_obj.paginator.num_pages }}">
+                                {{page_obj.paginator.num_pages }}</a></li>
+
+                            <li class="page-item"><a class="page-link"
+                                                     href="/friends/enter_requests/?page={{ page_obj.next_page_number }}">Next</a>
+                            </li>
+
+                            {% endif %}
+
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+

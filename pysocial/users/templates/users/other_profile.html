@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block avatar %}
+{% include 'avatar_base.html' %}
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="container">
+    <div class="row text-center pt-3">
+        <div class="col-4 offset-md-4">
+            <div class="border border-primary-subtle border-2">
+                <div class="card-body">
+                    <h4>Страница пользователя</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container pt-2">
+    <div class="row">
+
+        <div class="col-6 offset-md-3 border border-primary-subtle border-2">
+
+            <div class="row g-3 text-center">
+                <div class="col-6">
+                    <img src="{{ other_user_profile.photo.url }}" class="bd-placeholder-img rounded-circle mt-3"
+                         height="100" width="100" alt="не грузится фото">
+                </div>
+
+
+                <div class="col-6 mt-5">
+                    <h6>Дата рождения:</h6>
+                    {% if other_user_profile.date_birth %}
+                    <div class="tweet-content p-3 bg-light border rounded">
+                        {{ other_user_profile.date_birth|date:"d.m.Y" }}
+                    </div>
+                    {% else %}
+                    <div class="tweet-content bg-light border rounded">
+                        <p> - </p>
+                    </div>
+                    {% endif %}
+                </div>
+
+
+                <div class="col-6">
+                    <h6>username:</h6>
+                    <div class="tweet-content bg-light border rounded">
+                        {{ other_user_profile.username }}
+                    </div>
+                </div>
+
+                <div class="col-6 text-center">
+                    <h6>Грейд:</h6>
+                    {% if other_user_profile.grade %}
+                    <div class="tweet-content bg-light border rounded">
+                        {{ other_user_profile.grade }}
+                    </div>
+                    {% else %}
+                    <div class="tweet-content bg-light border rounded">
+                        <p> - </p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-6 text-center">
+                    <h6>Имя:</h6>
+                    <div class="tweet-content bg-light border rounded">
+                        {{ other_user_profile.first_name }}
+                    </div>
+                </div>
+                <div class="col-6 text-center">
+                    <h6>Фамилия:</h6>
+                    <div class="tweet-content bg-light border rounded">
+                        {{ other_user_profile.last_name }}
+                    </div>
+                </div>
+                <div class="col-12 text-center">
+                    <h6>Обо мне:</h6>
+                    {% if other_user_profile.about_me %}
+                    <div class="tweet-content bg-light border rounded">
+                        <p>{{ other_user_profile.about_me }}</p>
+                    </div>
+                    {% else %}
+                    <div class="tweet-content bg-light border rounded">
+                        <p> - </p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-12 text-center">
+                    <h6>Email:</h6>
+                    <div class="tweet-content bg-light border rounded">
+                        <p>{{ other_user_profile.email }}</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-2 offset-md-1 border border-primary-subtle border-2 text-center" style="height:180px">
+
+            {% if friend_status == 'friends'%}
+
+            <div class="mt-3">
+                <a href="{% url 'friends:user_friends' other_user_profile.id %}">
+                    Друзья пользователя:{{ other_user_profile.friends.count }}
+                </a>
+            </div>
+
+            {% endif %}
+
+            <form method="post" action="{% url 'users:other_user_profile' other_user_profile.id%}">
+                {% csrf_token %}
+
+                {% if friend_status == 'friends'%}
+                <p class="mt-4">Удалить из списка друзей?</p>
+                <button type="submit" class="btn btn-danger mt-2" name="button_pressed" value="friend_delete">Удалить
+                </button>
+
+
+                {% elif friend_status == 'nothing' %}
+                <div class="mt-4">
+                    Отправить предложение о дружбе?
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary mt-2" name="button_pressed" value="nothing_accept">
+                        Отправить
+                    </button>
+                </div>
+
+                {% elif friend_status == 'enter_request'%}
+                <div class="mt-4">
+                    Входящий запрос в друзья
+                </div>
+                <button type="submit" class="btn btn-success mt-3" name="button_pressed" value="enter_accept">
+                    Добавить
+                </button>
+                <button type="submit" class="btn btn-danger mt-2" name="button_pressed" value="enter_reject">
+                    Отклонить
+                </button>
+
+                {% elif friend_status == 'sent_request'%}
+                <div class="mt-4">
+                    вы отправили запрос друзья
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary mt-2" name="button_pressed" value="sent_reject">
+                        Отменить заявку
+                    </button>
+                </div>
+
+                {% endif %}
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

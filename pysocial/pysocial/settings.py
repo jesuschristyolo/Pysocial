@@ -1,6 +1,3 @@
-
-import os
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,8 +34,9 @@ INSTALLED_APPS = [
     'friends.apps.FriendsConfig',
     'chat.apps.ChatsConfig',
     'ribbon.apps.RibbonConfig',
-    'crispy_bootstrap5',
+    'bootstrap5',
     'crispy_forms',
+    'crispy_bootstrap5',
     'social_django',
     'debug_toolbar',
 ]

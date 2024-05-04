@@ -1,0 +1,26 @@
+<div class="col-1 offset-md-5">
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton1"
+                data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{{ user_object.photo.url }}" class="bd-placeholder-img rounded-circle"
+                 height="50" width="50">
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" href="{% url 'users:user_profile' %}">Моя страница</a></li>
+            <li><a class="dropdown-item" href="{% url 'friends:user_friends' user_object.id %}">Друзья</a></li>
+            <li><a class="dropdown-item" href="{% url 'chat:dialogue_start_page'  %}">Чаты</a></li>
+            <li><a class="dropdown-item" href="{% url 'ribbon:general_ribbon'  %}">Лента</a></li>
+            <li>
+                <form action="{% url 'users:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item">Выйти</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="col-1 mt-3">
+    <h5>
+        {{ user_object.username }}
+    </h5>
+</div>

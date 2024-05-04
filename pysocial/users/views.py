@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
 
@@ -35,13 +36,6 @@ class ProfileUser(DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
-        # try:
-        #     friend_list = FriendList.objects.get(user = get_user_model())
-        # except FriendList.DoesNotExist:
-        #     friend_list = FriendList(user = get_user_model())
-        #     friend_list.save()
-        # friends = friend_list.friends.all()
-        # context['friends'] = friends
         return context
 
     def get_object(self, queryset=None):
