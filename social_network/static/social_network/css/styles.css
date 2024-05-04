@@ -1,0 +1,181 @@
+/*.container {
+    max-width: 960px;
+}
+*/
+
+.super-color {
+    background: linear-gradient(to right, #f8f9e0 0%,#deeefc 14%);
+
+}
+
+header {
+    border-radius: 0px 0px 12px 12px;
+    background: linear-gradient(to right, #f8f9e0 0%,#deeefc 14%);
+}
+
+
+
+.rad {
+    border-radius: 10px;
+}
+
+####
+
+body{
+    margin-top:20px;
+}
+
+.chat-online {
+    color: #34ce57
+}
+
+.chat-offline {
+    color: #e4606d
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    max-height: 600px;
+    overflow-y: scroll
+}
+
+.chat-message-left,
+.chat-message-right {
+    display: flex;
+    flex-shrink: 0
+}
+
+.chat-message-left {
+    margin-right: auto
+}
+
+.chat-message-right {
+    flex-direction: row-reverse;
+    margin-left: auto
+}
+.py-3 {
+    padding-top: 1rem!important;
+    padding-bottom: 1rem!important;
+}
+.px-4 {
+    padding-right: 1.5rem!important;
+    padding-left: 1.5rem!important;
+}
+.flex-grow-0 {
+    flex-grow: 0!important;
+}
+.border-top {
+    border-top: 1px solid #dee2e6!important;
+}
+
+a:hover {
+    color: red; /* Цвет ссылки при наведении курсора */
+}
+
+.sticky-right {
+    position: fixed;
+    bottom: 10px; /* Регулируйте отступ снизу */
+    right: 340px; /* Регулируйте отступ справа */
+    z-index: 1000; /* Устанавливает порядок слоев, чтобы кнопка была поверх другого контента */
+}
+
+
+.code_body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.code_body form {
+    width: 100%;
+    max-width: 800px;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.code_body label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: bold;
+    color: black;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+#codearea,
+#output {
+    height: 300px;
+    font-size: 16px;
+    width: 100%;
+    border: 1px solid green;
+    border-radius: 5px;
+    padding: 12px;
+    margin-bottom: 24px;
+    resize: vertical;
+}
+
+#output {
+    height: 150px;
+    padding: 5px;
+}
+
+#post_content {
+    height: 150px;
+    font-size: 16px;
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 12px;
+    margin-bottom: 24px;
+    resize: vertical;
+}
+
+.code_body button {
+    color: green;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid green;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+
+.code_body button:hover {
+    background-color: #388e3c;
+    color: white;
+}
+
+.post-data {
+    max-width: 800px;
+    margin: auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.post-data label {
+    font-weight: bold;
+}
+
+.post-data textarea#codearea {
+    width: 100%;
+    min-height: 200px; /* Минимальная высота */
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-family: monospace;
+    resize: none; /* Запретить изменение размера */
+    overflow-x: auto; /* Появление полос прокрутки по горизонтали при необходимости */
+    overflow-y: auto;    /* Скрыть вертикальную полосу прокрутки */
+}
+
+

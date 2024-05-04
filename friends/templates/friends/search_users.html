@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block avatar %}
+{% include 'avatar_base.html' %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container pt-2 mt-5">
+    <div class="col-8 offset-md-2 border border-primary-subtle">
+        <div class="row g-3 text-center">
+            <div class="col-10 offset-md-1">
+                <div class="col-12 text-center mt-5">
+                    <h4>Поиск пользователей</h4>
+                </div>
+                <nav class="navbar bg-body-tertiary">
+
+                    <form class="container-fluid" method="POST"
+                          action="{% url 'friends:search_users' %}">
+                        {% csrf_token %}
+
+                        <div class="input-group">
+                            <span class="input-group-text" id="basic-addon1">@</span>
+                            <input type="text" class="form-control" placeholder="Поиск по username"
+                                   aria-label="Username"
+                                   aria-describedby="basic-addon1" name="searched_users">
+                        </div>
+                    </form>
+                </nav>
+            </div>
+
+            <div class="col-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">фото</th>
+                        <th scope="col">username</th>
+                        <th scope="col">name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td><img src="{{ user.photo.url }}" class="bd-placeholder-img rounded-circle" height="50"
+                                 width="50"></td>
+                        <td><a href="{% url 'users:other_user_profile' user.id %}">{{ user.username }}</a></td>
+                        <td>{{ user.name }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

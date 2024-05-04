@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block avatar %}
+{% include 'avatar_base.html' %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+#sticky-filters {
+    position: sticky !important;
+    top: 113px !important;
+    margin-left: 80px !important;
+    padding: 10px !important;
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 5px !important;
+    width: 250px !important;
+}
+
+
+
+</style>
+
+
+<div class="container-fluid">
+
+    <!--    Создание поста-->
+    <a href="{% url 'ribbon:create_new_post'  %}" class="btn btn-outline-primary btn-lg sticky-right">
+        <i class="fa-solid fa-plus"></i>
+    </a>
+    <!--    Создание поста-->
+
+    <!--        Фильтры-->
+    <div class="row">
+        <div class="col-lg-2">
+            <div id="sticky-filters" class="sticky-left top-0 start-0 p-3 bg-light border rounded"
+                 style="width: 250px;">
+
+                <h5>Фильтры</h5>
+                <form method="post" action="{% url 'ribbon:general_ribbon' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="filter_category" class="form-label">По пользователю:</label>
+                        <select class="form-select" id="filter_user" name="filter_user">
+
+                            <option> -</option>
+                            <option id="for_user_object" name="for_user_object">{{ user_object.username }}</option>
+                            {% for friend in user_object.friends.all %}
+                            <option id="for_user_friend" name="for_user_friend">{{ friend.username }}</option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="filter_category" class="form-label">Сортировать по:</label>
+
+                        <select class="form-select" id="filter_category" name="category">
+                            <option> -</option>
+                            <option id="count_comments" name="count_comments" value="count_comments">Количеству
+                                комментариев
+                            </option>
+                            <option id="count_likes_on_posts" name="count_likes_on_posts" value="count_likes_on_posts">
+                                Количеству лайков на постах
+                            </option>
+                            <option id="new ones first" name="new ones first" value="new ones first">
+                                Сначала новые
+                            </option>
+                            <option id="only_friends" name="only_friends" value="only_friends">
+                                Посты друзей
+                            </option>
+                        </select>
+
+                    </div>
+                    <button type="submit" class="btn btn-primary">Применить фильтры</button>
+                </form>
+            </div>
+        </div>
+        <!--        Фильтры-->
+
+
+        <div class="col-lg-8">
+            {% if posts %}
+            {% for post in posts %}
+
+            <div class="row justify-content-center mt-5">
+                <div class="card" style="max-width: 42rem">
+                    <div class="card-body">
+                        <!-- Data -->
+                        <div class="d-flex justify-content-between mb-3">
+                            {% if post.author.pk == user_object.pk %}
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <a href="{% url 'users:user_profile' %}">
+                                        <img src="{{ post.author.photo.url }}" class="border rounded-circle me-2"
+                                             alt="Avatar" width="40" height="40">
+                                    </a>
+                                </div>
+                                <div class="ml-2">
+                                    <div>
+                                        <a href="{% url 'users:user_profile' %}" class="text-dark mb-0">
+                                            <strong>{{ post.author.username }}</strong>
+                                        </a>
+                                    </div>
+                                    <div class="text-muted small text-nowrap mt-2">
+                                        {{ post.timestamp|date:"d F H:i" }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <a href="{% url 'ribbon:change_post' post.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Изменить
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <a href="{% url 'users:user_profile' %}">
+                                        <img src="{{ post.author.photo.url }}" class="border rounded-circle me-2"
+                                             alt="Avatar" width="40" height="40">
+                                    </a>
+                                </div>
+                                <div class="ml-2">
+                                    <div>
+                                        <a href="{% url 'users:user_profile' %}" class="text-dark mb-0">
+                                            <strong>{{ post.author.username }}</strong>
+                                        </a>
+                                    </div>
+                                    <div class="text-muted small text-nowrap mt-2">
+                                        {{ post.timestamp|date:"d F H:i" }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+
+                        {% if post.text_content %}
+                        <div class="tweet-content p-3 bg-light border rounded">
+                            {{ post.text_content }}
+                        </div>
+                        {% endif %}
+
+                        {% if post.code_content %}
+                        <div class="post-data">
+                            <div class="form-group mb-2">
+                                <label for="codearea">Код:</label>
+                                <textarea id="codearea" name="codearea" rows="1"
+                                          readonly>{{ post.code_content }}</textarea>
+                            </div>
+                            <hr>
+                            <div class="form-group mb-2">
+                                <label for="output">Output:</label>
+                                <textarea id="output" name="output" rows="4"
+                                          readonly>{{ post.output_content }}</textarea>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="card-body">
+                        <!-- Reactions -->
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                {% if post.id in liked_posts %}
+                                <button class="like-button" data-post-id="{{ post.id }}">
+                                    <i class="fas fa-heart text-danger"></i>
+                                </button>
+                                {% else %}
+                                <button class="like-button" data-post-id="{{ post.id }}">
+                                    <i class="far fa-heart text-danger"></i>
+                                </button>
+                                {% endif %}
+                                <span>{{ post.post_like.all|length }}</span>
+                            </div>
+
+                        </div>
+                        <!-- Reactions -->
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between text-center border-top border-bottom mb-4">
+                        </div>
+                        <!-- Buttons -->
+
+                        <div class="d-flex mb-3">
+                            <a href="{% url 'users:user_profile' %}">
+                                <img src="{{ user_object.photo.url }}" class="border rounded-circle me-2"
+                                     alt="Avatar" width="40" height="40">
+                            </a>
+
+                            <div class="form-outline w-100 flex-grow-1">
+                                <form id="commentForm_{{ post.id }}" method="post">
+                                    <!-- Добавляем уникальный идентификатор для формы -->
+                                    {% csrf_token %}
+                                    <input type="hidden" name="post_id" value="{{ post.id }}">
+
+                                    <textarea class="form-control" rows="3" name="comment"></textarea>
+                                    <label class="form-label">
+                                <span class="text-muted d-block"><small>
+                                    Оставьте комментарий
+                                </small></span>
+                                    </label>
+
+                                    <div class="text-end"> <!-- Помещаем кнопку "Отправить" вправо -->
+                                        <button type="submit" class="btn btn-primary">Оставить</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        {% if post.post_comment %}
+                        {% for comment in post.post_comment.all %}
+                        <div class="d-flex mb-3">
+                            <a href="">
+                                <img src="{{ comment.author.photo.url }}" class="border rounded-circle me-2"
+                                     alt="Avatar"
+                                     width="40" height="40">
+                            </a>
+                            <div>
+                                <div class="bg-light rounded-3 px-3 py-1">
+                                    <div class="text-dark mb-0">
+                                        <strong>{{ comment.author.username }}</strong>
+                                    </div>
+                                    <div class="d-block" style="font-size: 16px">
+                                        {{ comment.content }}
+                                    </div>
+                                </div>
+                                <button class="comment-like-button" data-comment-id="{{ comment.id }}">
+                                    {% if comment.id in liked_comments %}
+                                    <i class="fas fa-heart text-danger"></i>
+                                    {% else %}
+                                    <i class="far fa-heart text-danger"></i>
+                                    {% endif %}
+                                </button>
+                                <span>{{ comment.comment_like.count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+
+                        <div id="commentResult_{{ post.id }}">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-center mt-5">
+                <h2>Не найдено записей</h2>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+// Получение CSRF-токена и добавление его к данным перед отправкой запроса
+var csrftoken = $('input[name=csrfmiddlewaretoken]').val();
+
+
+</script>
+
+<script>
+$(document).ready(function() {
+    $('[id^="commentForm"]').submit(function(event) {
+        event.preventDefault(); // Предотвращаем перезагрузку страницы по умолчанию
+
+        var $form = $(this); // Сохраняем ссылку на текущую форму
+
+        var formData = $(this).serialize(); // Получаем данные формы
+        formData += '&csrfmiddlewaretoken=' + $('input[name=csrfmiddlewaretoken]').val(); // Добавляем CSRF токен
+        var postId = $(this).find('input[name="post_id"]').val(); // Получаем post_id из формы
+        // Добавляем post_id к данным формы
+        formData += '&post_id=' + postId;
+
+        var commentResultId = '#commentResult_' + postId; // Получаем уникальный идентификатор для результата комментария
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'ribbon:submit_comment' %}", // URL для обработки формы
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    // Получаем данные нового комментария из JSON-ответа
+                    var newComment = response.comment;
+                    // Создаем HTML-разметку для нового комментария
+                    var commentHTML = '<div class="d-flex mb-3">' +
+                        '<a href=""><img src="' + newComment.author_photo + '" class="border rounded-circle me-2" alt="Avatar" width="40" height="40"></a>' +
+                        '<div>' +
+                        '<div class="bg-light rounded-3 px-3 py-1">' +
+                        '<class="text-dark mb-0"><strong>' + newComment.author_username + '</strong>' +
+                        '<span class="text-muted d-block">' + newComment.content + '</span>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+                    // Добавляем новый комментарий на страницу
+                    $(commentResultId).append(commentHTML);
+                    // Очищаем поле комментария после успешной отправки
+                    $form.find('textarea[name="comment"]').val('');
+                } else {
+                    // Обработка ошибки, если JSON-ответ содержит 'success: false'
+                    $(commentResultId).html('<div class="alert alert-danger">Произошла ошибка при отправке комментария.</div>');
+                }
+            },
+            error: function(xhr, errmsg, err) {
+                // Обработка ошибки AJAX-запроса
+                $(commentResultId).html('<div class="alert alert-danger">Произошла ошибка при отправке комментария.</div>');
+            }
+        });
+    });
+});
+
+
+$(document).ready(function() {
+    $('.like-button').click(function() {
+        event.preventDefault(); // Предотвращаем перезагрузку страницы по умолчанию
+        var $button = $(this);
+        var post_id = $button.data('post-id');
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'ribbon:like_post' %}",
+            data: {'post_id': post_id,
+                   'csrfmiddlewaretoken': '{{ csrf_token }}', // Добавляем CSRF токен напрямую
+                   },
+            success: function(response) {
+                if (response.success) {
+                    if (response.action === 'add') {
+                        // Обновляем иконку лайка
+                        $button.find('i').removeClass('far').addClass('fas');
+                    } else if (response.action === 'delete') {
+                        // Обновляем иконку лайка
+                        $button.find('i').removeClass('fas').addClass('far');
+                    }
+                    // Обновляем количество лайков
+                    $button.next('span').text(response.likes_count);
+                }
+            },
+            error: function(xhr, status, error) {
+                // Обработка ошибок
+            }
+        });
+    });
+});
+
+$(document).ready(function() {
+    $('.comment-like-button').click(function() {
+        event.preventDefault(); // Предотвращаем перезагрузку страницы по умолчанию
+        var $button = $(this);
+        var comment_id = $button.data('comment-id');
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'ribbon:like_comment' %}",
+            data: {
+                'comment_id': comment_id,
+                'csrfmiddlewaretoken': '{{ csrf_token }}', // Добавляем CSRF токен напрямую
+            },
+            success: function(response) {
+                if (response.success) {
+                    if (response.action === 'add') {
+                        // Обновляем иконку лайка
+                        $button.find('i').removeClass('far').addClass('fas');
+                    } else if (response.action === 'delete') {
+                        // Обновляем иконку лайка
+                        $button.find('i').removeClass('fas').addClass('far');
+                    }
+                    // Обновляем количество лайков
+                    $button.next('span').text(response.likes_count);
+                }
+            },
+            error: function(xhr, status, error) {
+                // Обработка ошибок
+            }
+        });
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+{% endblock %}

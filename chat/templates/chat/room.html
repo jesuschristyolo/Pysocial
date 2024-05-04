@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% load static  %}
+
+
+{% block avatar %}
+{% include 'avatar_base.html' %}
+{% endblock %}
+
+{% block content %}
+
+<main class="content">
+    <div class="container p-0">
+        <h1 class="h3 mb-3 mt-2">Сообщения</h1>
+        <div class="card">
+            <div class="row g-0">
+
+
+                <div class="col-12 col-lg-5 col-xl-3 border-end">
+                    {% for channel in channel_objects %}
+                    {% if channel.first_user.pk == user_object.pk %}
+                    <a href="{% url 'chat:room' channel.channel_name %}"
+                       class="list-group-item list-group-item-action border-0  mt-3">
+                        <div class="badge bg-success rounded-pill float-end me-2">
+                            {% for key, value in unread_messages.items %}
+                            {% if key == channel.channel_name %}
+                            {{ value }}
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ channel.second_user.photo.url }}"
+                                 class="rounded-circle me-1 ms-2"
+                                 alt="{{ channel.second_user.username }}" width="40" height="40">
+                            <div class="flex-grow-1 ms-3">
+                                {{ channel.second_user.username }}
+                            </div>
+                        </div>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'chat:room' channel.channel_name %}"
+                       class="list-group-item list-group-item-action border-0  mt-3 pb-3">
+                        <div class="badge bg-success rounded-pill float-end me-2">
+                            {% for key, value in unread_messages.items %}
+                            {% if key == channel.channel_name %}
+                            {{ value }}
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ channel.first_user.photo.url }}"
+                                 class="rounded-circle me-1 ms-2"
+                                 alt="{{ channel.first_user.username }}" width="40" height="40">
+                            <div class="flex-grow-1 ms-3">
+                                {{ channel.first_user.username }}
+                            </div>
+                        </div>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+
+                <!--                Шапка чата-->
+                <div class="col-12 col-lg-7 col-xl-9">
+                    <div class="py-2 px-4 border-bottom d-none d-lg-block">
+                        <div class="d-flex align-items-center py-1">
+                            <div class="position-relative">
+                                <img src="{{ companion.photo.url }}"
+                                     class="rounded-circle mr-1" alt="{{ companion.username }}" width="40" height="40">
+                            </div>
+                            <a href="{% url 'users:other_user_profile' companion.pk%}" style="color: black; text-decoration: none;">
+                                <div class="flex-grow-1 ms-3 " style="transition: color 0.3s;">
+                                    <strong>{{ companion.username }}</strong>
+                                </div>
+                            </a>
+                            <!-- Кнопка "Удалить чат" -->
+                            <button type="button" class="btn btn-danger ms-auto" data-bs-toggle="modal"
+                                    data-bs-target="#deleteChatModal">
+                                Удалить чат
+                            </button>
+                            <!-- Модальное окно "Вы уверены?" -->
+                            <div class="modal fade" id="deleteChatModal" tabindex="-1" role="dialog"
+                                 aria-labelledby="deleteChatModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteChatModalLabel">Вы уверены?</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Вы уверены, что хотите удалить этот чат?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                                                Нет
+                                            </button>
+                                            <form action="{% url 'chat:room' room_name %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" name="delete_room" value="{{ room_name }}"
+                                                        class="btn btn-success ms-auto">Удалить чат
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                Шапка чата-->
+
+
+                    <div class="position-relative">
+                        <div class="chat-messages p-4">
+
+                            {% if messages %}
+                            {% for message in messages %}
+                            {% if message.sender == request.user %}
+                            <div class="chat-message-right pb-4">
+                                <div>
+                                    <img src="{{ message.sender.photo.url }}"
+                                         class="rounded-circle mr-1" alt="{{ message.sender.username }}" width="40"
+                                         height="40">
+                                    <div class="text-muted small text-nowrap mt-2">
+                                        {{ message.timestamp|date:"d F" }}<br>{{ message.timestamp|time:"H:i" }}
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
+                                    <div class="h6 mb-1">
+                                        <strong>
+                                            {{ message.sender.username }}
+                                        </strong>
+                                    </div>
+                                    {{ message.content }}
+                                </div>
+                            </div>
+
+                            {% else %}
+
+                            <div class="chat-message-left pb-4">
+                                <div>
+                                    <img src="{{ message.sender.photo.url }}"
+                                         class="rounded-circle mr-1" alt="{{ message.sender.username }}" width="40"
+                                         height="40">
+                                    <div class="text-muted small text-nowrap mt-2">
+                                        {{ message.timestamp|date:"d F" }}<br>{{ message.timestamp|time:"H:i" }}
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
+
+                                    <div class="h6 mb-1">
+                                        <strong>
+                                            {{message.sender.username}}
+                                        </strong>
+                                    </div>
+
+                                    {{ message.content }}
+                                </div>
+                            </div>
+
+                            {% endif %}
+                            {% endfor %}
+                            {% else %}
+
+                            <div class="d-flex flex-column justify-content-center align-items-center"
+                                 style="height: 100%;">
+                                <div class="text-center">
+                                    <h4>Напишите первое сообщение!!</h4>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                        <div class="flex-grow-0 py-3 px-4 border-top">
+                            <div class="input-group">
+                                <input type="hidden" id="sender-message-username-input" value="{{ user.username }}">
+                                <input type="hidden" id="sender-message-pk-input" value="{{ user.pk }}">
+                                <input type="hidden" id="receiver-message-pk-input" value="{{ companion.pk }}">
+                                <input type="hidden" id="channel-pk" value="{{ current_channel.pk }}">
+                                <input type="text" id="chat-message-input" class="form-control"
+                                       placeholder="Введите сообщение...">
+                                <button class="btn btn-primary" id="chat-message-submit" value="Send">Отправить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script src="{% static 'social_network/js/reconnecting-websocket.js' %}"></script>
+{{ room_name|json_script:"room-name" }}
+<script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        var chatSocket = new ReconnectingWebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + roomName + '/');
+
+
+        chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const chatMessagesContainer = document.querySelector('.chat-messages');
+
+        // Создаем новый элемент div для сообщения
+        const messageDiv = document.createElement('div');
+
+        var senderInputDom = document.querySelector('#sender-message-username-input');
+        var sender = senderInputDom.value;
+
+        if (data.sender == sender) {
+            messageDiv.className = 'chat-message-right pb-4';
+            messageDiv.innerHTML = `
+                <div>
+                    <img src="${data.sender_photo}"
+                                 class="rounded-circle mr-1 d-flex align-items-center"
+                                 alt="Vanessa Tucker" width="40" height="40">
+                </div>
+                <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
+                    <div class="h6 mb-1"><strong>${data.sender}</strong></div>
+                    ${data.message}
+                </div>
+            `;
+        } else {
+            messageDiv.className = 'chat-message-left pb-4';
+            messageDiv.innerHTML = `
+                <div>
+                    <img src="${data.sender_photo}"
+                                 class="rounded-circle mr-1 d-flex align-items-center"
+                                 alt="Vanessa Tucker" width="40" height="40">
+                    <div class="text-muted small text-nowrap mt-2">2:34 am</div>
+                </div>
+                <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
+                    <div class="h6 mb-1"><strong>${data.sender}</strong></div>
+                    ${data.message}
+                </div>
+            `;
+        }
+        chatMessagesContainer.appendChild(messageDiv);
+        };
+
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.key == 'Enter') {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const senderInputDom = document.querySelector('#sender-message-username-input');
+            const senderPkInputDom = document.querySelector('#sender-message-pk-input');
+            const receiverPkInputDom = document.querySelector('#receiver-message-pk-input');
+            const channelPkInputDom = document.querySelector('#channel-pk');
+
+
+            const message = messageInputDom.value;
+            const sender = senderInputDom.value;
+            const sender_pk = senderPkInputDom.value;
+            const receiver_pk = receiverPkInputDom.value;
+            const channel_pk = channelPkInputDom.value;
+
+
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'sender': sender,
+                'sender_pk': sender_pk,
+                'receiver_pk': receiver_pk,
+                'channel_pk': channel_pk,
+            }));
+            messageInputDom.value = '';
+        };
+
+
+
+</script>
+
+
+{% endblock %}
+
+

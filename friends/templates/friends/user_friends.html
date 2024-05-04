@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block avatar %}
+{% include 'avatar_base.html' %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container pt-2 mt-5">
+    <div class="row g-3 text-center">
+
+        <div class="col-8 offset-md-2 border border-primary-subtle border-2">
+            {% if main_user %}
+            <div class="position-relative mt-1">
+                <a href="{% url 'friends:enter_requests' %}" class="btn btn-primary"
+                   role="button">Входящие запросы</a>
+                <a href="{% url 'friends:sent_requests' %}" class="btn btn-primary"
+                   role="button">Отправленные заявки</a>
+                <a href="{% url 'friends:search_users' %}" class="btn btn-primary"
+                   role="button">Найти пользователей</a>
+            </div>
+
+            <div class="col-12 text-center mt-5">
+                <h4>Мои друзья</h4>
+            </div>
+            {% else %}
+            <div class="col-12 text-center mt-5">
+                <h4>Друзья пользователя</h4>
+            </div>
+            {% endif %}
+
+            <div class="col-12">
+                <nav class="navbar bg-body-tertiary">
+                    <form class="container-fluid" method="POST"
+                          action="{% url 'friends:user_friends' user.id %}">
+                        {% csrf_token %}
+
+                        <div class="input-group">
+                            <span class="input-group-text" id="basic-addon1">@</span>
+                            <input type="text" class="form-control" placeholder="Поиск по username"
+                                   aria-label="Username"
+                                   aria-describedby="basic-addon1" name="searched_friends">
+                        </div>
+                    </form>
+                </nav>
+            </div>
+            {% if main_user %}
+            <div class="col-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">фото</th>
+                        <th scope="col">username</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if user_friends %}
+                    {% for user_friend in user_friends %}
+                    <tr>
+                        <td><img src="{{ user_friend.photo.url }}" class="bd-placeholder-img rounded-circle" height="30"
+                                 width="30"></td>
+                        <td><a href="{% url 'users:other_user_profile' user_friend.id %}">{{ user_friend.username }}</a>
+                        </td>
+                        <td><a href="{% url 'chat:write_first_message' user_friend.id %}" class="btn btn-success">Написать
+                            сообщение</a></td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">фото</th>
+                        <th scope="col">username</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if user_friends %}
+                    {% for user_friend in user_friends %}
+                    {% if user_friend.pk == user_object.pk %}
+                    <tr>
+                        <td><img src="{{ user_object.photo.url }}" class="bd-placeholder-img rounded-circle" height="30"
+                                 width="30"></td>
+                        <td><a href="{% url 'users:user_profile' %}">{{ user_object.username }}</a></td>
+                        <td>{{ user_object.name }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td><img src="{{ user_friend.photo.url }}" class="bd-placeholder-img rounded-circle" height="30"
+                                 width="30"></td>
+                        <td><a href="{% url 'users:other_user_profile' user_friend.id %}">{{ user_friend.username }}</a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

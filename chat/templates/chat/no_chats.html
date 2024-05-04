@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block avatar %}
+{% include 'avatar_base.html' %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid d-flex justify-content-center align-items-top vh-300 mt-5">
+    <div class="text-center">
+        <h4>Кажется, у вас нет чатов начните новый чат </h4>
+        <a href="{% url 'friends:search_users' %}" class ="btn btn-success mt-3">Найти собеседника</a>
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
