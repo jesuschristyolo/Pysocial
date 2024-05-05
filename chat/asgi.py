@@ -6,18 +6,23 @@ from django.core.asgi import get_asgi_application
 
 from chat.routing import websocket_urlpatterns
 
+# Устанавливаем переменную окружения DJANGO_SETTINGS_MODULE
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
-# Initialize Django ASGI application early to ensure the AppRegistry
-# is populated before importing code that may import ORM models.
-django_asgi_app = get_asgi_application()
 
+# Инициализируем приложение Django ASGI заранее, чтобы гарантировать,
+# что AppRegistry заполнен перед импортом кода, который может импортировать модели ORM.
+django_asgi_app = get_asgi_application()
 
 application = ProtocolTypeRouter(
     {
+        # Протокол HTTP
         "http": django_asgi_app,
+        # Протокол WebSocket
         "websocket": AllowedHostsOriginValidator(
             # сссылка на текущ аутентифик пользователя
-            AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+            AuthMiddlewareStack(
+                # Маршрутизатор URL, который маршрутизирует WebSocket-запросы
+                URLRouter(websocket_urlpatterns))
         ),
     }
 )

@@ -7,13 +7,26 @@ from .models import Message
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    """
+    Класс ChatConsumer представляет собой WebSocket-потребителя, который обрабатывает взаимодействие чата.
+    Пользователи могут подключаться к комнате чата, отправлять и получать сообщения.
+    Methods:
+        connect(): Вызывается при подключении нового WebSocket-клиента к комнате чата.
+        disconnect(): Вызывается при отключении WebSocket-клиента от комнаты чата.
+        receive(): Вызывается при получении сообщения от WebSocket-клиента.
+        chat_message(): Отправляет сообщение всем клиентам в комнате чата.
+
+    """
+
     async def connect(self):
+        # Получаем имя комнаты из URL-маршрута
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
 
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
+        # Принимаем WebSocket-соединение
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -22,6 +35,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
+        # Получаем сообщение от WebSocket-клиента
         text_data_json = json.loads(text_data)
         print(text_data_json, 'text_data')
 
@@ -38,13 +52,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Receive message from room group
     async def chat_message(self, event):
-        print(event)
         message = event["message"]
         sender = event["sender"]
 
         user = await sync_to_async(User.objects.get)(username=sender)
         sender_photo = user.photo.url
-        print(sender_photo)
 
         await sync_to_async(Message.create_object)(
             new_sender_pk=event["sender_pk"],
