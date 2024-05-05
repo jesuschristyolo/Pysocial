@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django.urls import reverse_lazy
@@ -48,8 +48,24 @@ class LoginUserForm(AuthenticationForm):
 
 
 class ProfileUserForm(forms.ModelForm):  # disabled - нвозможность редактир имя пользователя
+    """
+        Форма редактирования профиля пользователя.
+
+        Класс ProfileUserForm представляет собой форму, позволяющую пользователям редактировать
+        информацию о своем профиле. Форма содержит поля для изменения имени пользователя, даты рождения,
+        фотографии профиля, краткого описания о себе, а также имени и фамилии.
+
+        Используется django_Crispy_form
+    """
 
     def __init__(self, *args, **kwargs):
+        """
+        Инициализация формы с установкой дополнительных параметров.
+        Конструктор класса ProfileUserForm устанавливает дополнительные параметры формы,
+        такие как действие формы (URL-адрес для отправки данных) и добавление кнопки "Редактировать".
+        С использованием django_crispy_form
+        """
+
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_action = reverse_lazy('users:user_profile')
@@ -66,4 +82,3 @@ class ProfileUserForm(forms.ModelForm):  # disabled - нвозможность �
 
         labels = {'first_name': 'Имя',
                   'last_name': 'Фамилия', }
-
