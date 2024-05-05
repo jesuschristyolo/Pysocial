@@ -76,6 +76,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pysocial.wsgi.application'
 ASGI_APPLICATION = 'chat.asgi.application'
 
+"""
+Настройка Channels с помощью Redis
+"""
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -85,8 +88,20 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+"""
+Настройка кэширования
+"""
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        # Адрес нашего сервера
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+    }
+}
 
 DATABASES = {
     'default': {
@@ -179,6 +194,28 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 # crispy_form - END
 
+"""
+Логирование
+"""
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'C:/Python Projects/django_social/py_logs.log',
+        },
+    },
+    # логгеры которые будут логировать наши сообщения
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
 
 #
 # SOCIAL_AUTH_PIPELINE = (

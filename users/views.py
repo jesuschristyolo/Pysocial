@@ -1,23 +1,25 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
-
 from django.contrib.auth.views import LoginView, PasswordChangeView
-
 from chat.models import ChannelNames
 from friends.models import FriendRequest
 from users.forms import RegisterUserForm, LoginUserForm, ProfileUserForm
 from users.models import User
+import logging
+
+# используем имя модуля для названия текущего логгера
+logger = logging.getLogger(__name__)
 
 
 class RegisterUser(CreateView):
     form_class = RegisterUserForm
     template_name = 'users/register.html'
     extra_context = {'title': 'Регистрация'}
+    logger.info("Зарегистрировался новый пользователь")
     success_url = reverse_lazy('users:login')
 
 
