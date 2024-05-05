@@ -52,11 +52,9 @@ def create_new_post(request):
             return redirect('ribbon:general_ribbon')
 
         if request.POST['codearea']:
-            print(request.POST)
             codeareadata = request.POST['codearea'] if request.POST['codearea'] else None
             post_content = request.POST['post_content'] if request.POST['post_content'] else None
             output = execute_code(codeareadata)
-            print(output)
             return render(request, 'ribbon/create_new_post.html',
                           {"code": codeareadata, "output": output, "post_content": post_content})
 
@@ -79,11 +77,9 @@ def change_post(request, post_id):
             return redirect('ribbon:general_ribbon')
 
         if request.POST['codearea']:
-            print(request.POST)
             codeareadata = request.POST['codearea'] if request.POST['codearea'] else None
             post_content = request.POST['post_content'] if request.POST['post_content'] else None
             output = execute_code(codeareadata)
-            print(output)
             return render(request, 'ribbon/change_post.html',
                           {"code": codeareadata, "output": output, "post_content": post_content, 'post_id': post_id})
 
@@ -142,7 +138,6 @@ def general_ribbon(request):
                       Like.objects.filter(author=request.user, comment_like=comment).exists()]
 
     if request.method == 'POST':
-        print(request.POST)
         filter_user = request.POST.get('filter_user', None)
         category = request.POST.get('category', None)
         if filter_user == "-":
@@ -166,7 +161,6 @@ def general_ribbon(request):
                                                               "liked_posts": liked_posts,
                                                               "liked_comments": liked_comments})
     else:
-        print(request.GET, 'get')
         return render(request, 'ribbon/general_ribbon.html', {"posts": posts,
                                                               "liked_posts": liked_posts,
                                                               "liked_comments": liked_comments})
@@ -176,7 +170,6 @@ def general_ribbon(request):
 def submit_comment(request):
     if request.method == 'POST':
         comment_text = request.POST.get('comment')
-        print(request.POST, 'submit')
         post_id = request.POST['post_id']
 
         new_comment = Comment.objects.create(author=request.user, content=comment_text,

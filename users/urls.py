@@ -1,6 +1,7 @@
 from django.contrib.auth.views import LogoutView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, \
     PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.urls import path, reverse_lazy
+from django.views.decorators.cache import cache_page
 
 from . import views
 from .views import UserPasswordChange
@@ -38,7 +39,7 @@ urlpatterns = [
          PasswordResetCompleteView.as_view(template_name="users/password_reset_complete.html"),
          name='password_reset_complete'),
 
-    path('user_profile/', views.ProfileUser.as_view(), name='user_profile'),
-    path('other_user_profile/<int:pk>/', views.other_user_profile, name='other_user_profile'),
+    path('user_profile/', cache_page(30)(views.ProfileUser.as_view()), name='user_profile'),
+    path('other_user_profile/<int:pk>/', cache_page(30)(views.other_user_profile), name='other_user_profile'),
     path('update_profile/', views.UpdateProfile.as_view(), name='update_profile'),
 ]

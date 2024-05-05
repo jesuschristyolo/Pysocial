@@ -12,39 +12,57 @@ from users.models import User
 import logging
 
 # используем имя модуля для названия текущего логгера
+logging.basicConfig(filename='C:/Python Projects/django_social/py_logs.log', level=logging.INFO, encoding="UTF-8")
 logger = logging.getLogger(__name__)
 
 
 class RegisterUser(CreateView):
+    """Класс представления регистрации нового пользователя"""
     form_class = RegisterUserForm
     template_name = 'users/register.html'
     extra_context = {'title': 'Регистрация'}
-    logger.info("Зарегистрировался новый пользователь")
     success_url = reverse_lazy('users:login')
+
+    def form_valid(self, form):
+        # Вызываем метод form_valid() родительского класса
+        response = super().form_valid(form)
+        username = form.cleaned_data.get('username')
+        # Записываем в лог информацию о успешной регистрации
+        logger.info(f"Зарегистрировался новый пользователь {username}")
+        # Возвращаем ответ
+        return response
 
 
 class LoginUser(LoginView):
+    """Класс представления профиля пользователя"""
     form_class = LoginUserForm
     template_name = 'users/login.html'
 
     def get_success_url(self):
+        """Возвращает URL-адрес перенаправления после успешного входа."""
         return reverse_lazy('users:user_profile')
 
 
 class ProfileUser(DetailView):
+    """Представление для отображения профиля пользователя."""
     model = get_user_model()
     template_name = 'users/profile.html'
     context_object_name = 'user_object'
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
     def get_object(self, queryset=None):
+        """Получает объект пользователя и записывает информацию в лог."""
+        logger.info(f'Пользователь {self.request.user.username} просматривает страницу своего профиля.')
         return self.request.user
 
 
 def other_user_profile(request, pk):
+    """
+    Представление для отображения профиля другого пользователя и управления запросами на дружбу.
+    Это представление отображает профиль другого пользователя и позволяет текущему
+    пользователю отправлять запросы на дружбу, принимать или отклонять запросы, удалять
+    друга из списка друзей и т.д. Записи о действиях пользователя записываются в лог.
+    """
+
     other_profile = User.objects.get(pk=pk)
     user = request.user
     if request.method == 'POST':
@@ -59,9 +77,11 @@ def other_user_profile(request, pk):
             other_profile.friends.add(user)
             ChannelNames.objects.create(first_user=other_profile, second_user=user,
                                         channel_name=f"{other_profile.pk}_{user.pk}")
+            logger.info(f'Пользователь {user.username} принял запрос в друзья от {other_profile.username}.')
 
         elif button_pressed == 'enter_reject':
             FriendRequest.objects.filter(Q(sender=other_profile) & Q(receiver=user)).delete()
+            logger.info(f'Пользователь {user.username} отклонил запрос в друзья от {other_profile.username}.')
 
         elif button_pressed == 'sent_reject':
             FriendRequest.objects.filter(Q(sender=user) & Q(receiver=other_profile)).delete()
@@ -69,6 +89,7 @@ def other_user_profile(request, pk):
         elif button_pressed == 'friend_delete':
             user.friends.remove(other_profile)
             other_profile.friends.remove(user)
+            logger.info(f'Пользователь {user.username} удалил из списка друзей {other_profile.username}.')
 
         return redirect('users:other_user_profile', other_profile.pk)
 
@@ -91,6 +112,14 @@ def other_user_profile(request, pk):
 
 
 class UpdateProfile(UpdateView):
+    """
+    Представление для обновления профиля пользователя.
+
+    Класс UpdateProfile является подклассом UpdateView Django и используется
+    для отображения и обновления профиля пользователя. При успешном обновлении
+    профиля записывается информация об изменении имени пользователя в лог.
+    """
+
     model = get_user_model()
     form_class = ProfileUserForm
     template_name = 'users/update_profile.html'
@@ -100,6 +129,22 @@ class UpdateProfile(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('users:user_profile')
+
+    def form_valid(self, form):
+        # Получаем старое и новое имя пользователя
+        old_username = self.request.user.username
+        new_username = form.cleaned_data['username']
+
+        # Вызываем метод form_valid() родительского класса
+        response = super().form_valid(form)
+
+        # Проверяем, изменилось ли имя пользователя
+        if old_username != new_username:
+            # Записываем в лог информацию об изменении имени пользователя
+            logger.info(f'Пользователь {old_username} изменил username на {new_username}')
+
+        # Возвращаем ответ
+        return response
 
 
 class UserPasswordChange(PasswordChangeView):

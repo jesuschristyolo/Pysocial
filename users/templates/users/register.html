@@ -18,18 +18,20 @@
             <div class="row g-3">
                 <div class="col-8 offset-md-2">
                     <div class="form-group" style="">
-                        <form method = "POST">
+                        <form method="POST">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <button class = "btn btn-secondary">Post</button>
+                            <button class="btn btn-secondary">Зарегистрироваться</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
 
-        {% endblock %}
+{% endblock %}
 
 
 

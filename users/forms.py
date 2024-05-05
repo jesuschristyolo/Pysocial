@@ -29,6 +29,8 @@ class RegisterUserForm(UserCreationForm):
 
     def clean_email(self):  # проверка что у разных пользователей разыне емэйлы
         email = self.cleaned_data['email']
+        if len(self.cleaned_data['email']) == 0:
+            return email
         if get_user_model().objects.filter(email=email).exists():
             raise forms.ValidationError("Email существует")
         return email
