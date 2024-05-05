@@ -1,0 +1,6 @@
+socialvenv/
+pysocial/pysocial/settings.py
+pysocial/media/
+pysocial/cert.crt
+pysocial/cert.key
+pysocial/env.dev
