@@ -145,7 +145,6 @@ def room(request, room_name):
 
         except:
             # Если возникает ошибка при получении информации
-            # о канале чата, отображаем страницу с информацией об ошибке
             return render(request, "chat/room.html", {
                 "room_name": room_name,
                 "user": request.user,

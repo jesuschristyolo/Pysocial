@@ -1,21 +1,28 @@
 import subprocess
-
 from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 import traceback
-
 from django.views.decorators.csrf import csrf_exempt
-
 from ribbon.models import Posts, Comment, Like
 from users.models import User
+import logging
+
+# используем имя модуля для названия текущего логгера
+logging.basicConfig(filename='C:/Python Projects/django_social/py_logs.log', level=logging.INFO, encoding="UTF-8")
+logger = logging.getLogger(__name__)
 
 
 class TimeoutError(Exception):
-    pass
+    """Исключение, возникающее при превышении времени выполнения кода."""
 
 
 def execute_code(code):
+    """
+    Выполняет переданный пользователем код в отдельном процессе. С тайм-аутом в 5 секунд
+    по истечении которого процесс завершается и срабатывает пользовательское исключение
+    """
+
     try:
         # Запускаем выполнение кода в отдельном процессе
         process = subprocess.Popen(['python', '-c', code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -42,6 +49,12 @@ def execute_code(code):
 
 
 def create_new_post(request):
+    """
+    Создает новый пост на основе данных, полученных из формы.
+    Если метод запроса POST и в форме есть данные, создает новый пост и перенаправляет пользователя на общую ленту.
+    Если в форме есть код, выполняет его и возвращает результат выполнения вместе с данными из формы для отображения.
+    """
+
     if request.method == 'POST':
 
         if 'create_post' in request.POST:
@@ -65,6 +78,24 @@ def create_new_post(request):
 
 
 def change_post(request, post_id):
+    """
+    Изменяет существующий пост на основе данных, полученных из формы.
+
+    Если метод запроса POST и в форме есть данные, изменяет существующий пост и перенаправляет пользователя на общую ленту.
+    Если в форме есть код, выполняет его и возвращает результат выполнения вместе с данными из формы для отображения.
+
+    Поведение:
+
+        - Если запрос отправлен методом POST и пользователь нажал кнопку "изменить пост":
+         изменяет существующий пост и перенаправляет пользователя на общую ленту.
+        - Если в форме есть код, и пользователь нажал кнопку: "Run Code":
+         выполняет его и возвращает результат выполнения вместе с данными из формы для отображения.
+        - Если запрос отправлен методом GET, отображает форму изменения поста с текущим содержимым
+        (кодом и комментарием к коду).
+        - Если запрашиваемый пост не существует или передан неверный идентификатор, возвращает ошибку 404.
+        - В случае возникновения исключений при выполнении кода, возвращает ошибку с соответствующим сообщением.
+
+    """
     if request.method == 'POST':
 
         if 'change_post' in request.POST:
@@ -95,6 +126,20 @@ def change_post(request, post_id):
 
 
 def data_generation(user_object=None, sort_category=None, sort_user=None):
+    """
+    Функция для генерации данных постов в зависимости от выбранных параметров сортировки.
+
+    user_object (User, optional): Объект пользователя, для которого выполняется фильтрация (по умолчанию None).
+    sort_category (str, optional): Категория сортировки постов (по количеству комментариев, лайков и т.д.)
+                                   (по умолчанию None).
+    sort_user (str, optional): Пользователь, для которого выполняется фильтрация постов (по умолчанию None).
+
+    Поведение:
+        - В зависимости от переданных параметров сортировки и фильтрации генерирует QuerySet с постами.
+        - Посты могут быть отсортированы по различным категориям (количеству комментариев, лайков и т.д.),
+          либо отфильтрованы по авторству конкретного пользователя.
+        - Если не переданы параметры сортировки и фильтрации, возвращает все посты, отсортированные по дате добавления.
+    """
     posts = None
 
     if sort_user is None:
@@ -132,6 +177,16 @@ def data_generation(user_object=None, sort_category=None, sort_user=None):
 
 
 def general_ribbon(request):
+    """
+    Представление для отображения общей ленты постов с возможностью добавления постов, фильтрации и сортировки.
+
+    Поведение:
+        - Если запрос отправлен методом POST и переданы параметры фильтрации и сортировки, генерирует и отображает
+          ленту постов в соответствии с этими параметрами.
+        - Если запрос отправлен методом GET, отображает ленту постов с применением текущих фильтров и сортировки.
+        - Пользователь может фильтровать посты по категории (количеству комментариев, лайков и т.д.) и/или
+          выбирать конкретного пользователя для отображения его постов.
+    """
     posts = Posts.objects.all().order_by("timestamp")
     liked_posts = [post.id for post in posts if Like.objects.filter(author=request.user, post_like=post).exists()]
     liked_comments = [comment.id for comment in Comment.objects.all() if
@@ -168,6 +223,14 @@ def general_ribbon(request):
 
 @csrf_exempt
 def submit_comment(request):
+    """
+
+    Это представление отправляет новый комментарий к посту. Если метод запроса POST,
+    создает новый комментарий на основе данных из запроса
+    и возвращает JSON-ответ с данными нового комментария.
+    Если метод запроса не POST, возвращает JSON-ответ об ошибке.
+
+    """
     if request.method == 'POST':
         comment_text = request.POST.get('comment')
         post_id = request.POST['post_id']
@@ -175,8 +238,9 @@ def submit_comment(request):
         new_comment = Comment.objects.create(author=request.user, content=comment_text,
                                              post_comment=Posts.objects.get(pk=post_id))
 
-        print('ok', "[", new_comment.author.username, new_comment.author.photo.url, new_comment.content,
-              new_comment.timestamp.strftime('%Y-%m-%d %H:%M:%S'), "]")
+        logger.info(f"{new_comment.author.username} Оставил комментарий"
+                    f"Посту с id {new_comment.post_comment.pk}")
+
         new_comment_data = {
             'author_username': new_comment.author.username,
             'author_photo': new_comment.author.photo.url,
@@ -192,6 +256,14 @@ def submit_comment(request):
 
 
 def like_post(request):
+    """
+     Это представление обрабатывает действия по лайку к посту. Если метод запроса POST,
+     то оно добавляет лайк к посту, если пользователь еще не лайкал этот
+     пост, или удаляет лайк, если пользователь уже лайкал пост.
+     Возвращает JSON-ответ с информацией об успешности выполнения операции,
+     количестве лайков после действия и типе действия (добавление или удаление).
+    """
+
     if request.method == 'POST':
         post_id = request.POST.get('post_id')
         try:
@@ -202,18 +274,29 @@ def like_post(request):
         if not Like.objects.filter(author=request.user, post_like=post).exists():
             new_like = Like.objects.create(author=request.user, post_like=post)
             likes_count = post.count_likes()
-            print('add')
+            logger.info(f"{new_like.author} Поставил лайк"
+                        f"Посту с id {new_like.post_like.pk}")
             return JsonResponse({'success': True, 'likes_count': likes_count, 'action': 'add'})
         else:
             Like.objects.filter(author=request.user, post_like=post).delete()
             likes_count = post.count_likes()
-            print('delete')
+            logger.info(f"{request.user.username} Удалил лайк"
+                        f"с поста {post.pk}")
             return JsonResponse({'success': True, 'likes_count': likes_count, 'action': 'delete'})
 
     return JsonResponse({'success': False})
 
 
 def like_comment(request):
+    """
+    Это представление обрабатывает действия по лайку к комментарию.
+    Если метод запроса POST, то оно добавляет лайк к комментарию,
+    если пользователь еще не лайкал этот комментарий, или удаляет лайк,
+    если пользователь уже лайкал комментарий. Возвращает JSON-ответ
+    с информацией об успешности выполнения операции, типе действия
+    (добавление или удаление) и количестве лайков после действия.
+    """
+
     if request.method == 'POST':
         comment_id = request.POST.get('comment_id')
         try:
@@ -222,8 +305,7 @@ def like_comment(request):
             return JsonResponse({'success': False})
 
         user = request.user
-        liked = Like.objects.filter(author=user, comment_like=comment).exists()
-        if liked:
+        if Like.objects.filter(author=user, comment_like=comment).exists():
             Like.objects.filter(author=user, comment_like=comment).delete()
             action = 'delete'
         else:
