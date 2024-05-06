@@ -308,9 +308,13 @@ def like_comment(request):
         if Like.objects.filter(author=user, comment_like=comment).exists():
             Like.objects.filter(author=user, comment_like=comment).delete()
             action = 'delete'
+            logger.info(f"пользователь {request.user.username} Удалил лайк"
+                        f"с комментария {comment.pk}")
         else:
             Like.objects.create(author=user, comment_like=comment)
             action = 'add'
+            logger.info(f"Пользователь {request.user.username} Поставил лайк"
+                        f"посту с id {comment.pk}")
         likes_count = comment.comment_like.count()
         return JsonResponse({'success': True, 'action': action, 'likes_count': likes_count})
     return JsonResponse({'success': False})

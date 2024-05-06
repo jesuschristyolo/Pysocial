@@ -98,7 +98,6 @@ def other_user_profile(request, pk):
         if user.friends:
             if user.friends.filter(id=other_profile.pk).exists():
                 friend_status = 'friends'
-                print('friends')
 
         if FriendRequest.objects.filter(
                 Q(sender=user) & Q(receiver=other_profile)):  # если мы отправляли на страницу
@@ -106,7 +105,6 @@ def other_user_profile(request, pk):
         elif FriendRequest.objects.filter(
                 Q(sender=other_profile) & Q(receiver=user)):  # если пользователь страницы отправил нам
             friend_status = 'enter_request'
-        print(friend_status)
         return render(request, 'users/other_profile.html',
                       {'other_user_profile': other_profile, 'self_client': user, 'friend_status': friend_status})
 

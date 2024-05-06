@@ -40,6 +40,6 @@ urlpatterns = [
          name='password_reset_complete'),
 
     path('user_profile/', cache_page(30)(views.ProfileUser.as_view()), name='user_profile'),
-    path('other_user_profile/<int:pk>/', cache_page(30)(views.other_user_profile), name='other_user_profile'),
+    path('other_user_profile/<int:pk>/', views.other_user_profile, name='other_user_profile'),
     path('update_profile/', views.UpdateProfile.as_view(), name='update_profile'),
 ]
